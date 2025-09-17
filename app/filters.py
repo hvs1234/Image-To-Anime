@@ -2,7 +2,6 @@ from PIL import Image, ImageEnhance, ImageFilter
 import torch
 import torchvision.transforms as T
 
-# Load pretrained AnimeGANv2 generator
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model = torch.hub.load(
     "bryandlee/animegan2-pytorch:main", 

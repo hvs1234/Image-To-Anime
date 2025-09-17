@@ -6,7 +6,7 @@ from filters import apply_ghibli_style, apply_sketch_style
 st.set_page_config(page_title="Image To Anime", page_icon="🎨", layout="wide")
 st.title("✨ Get Your Own Anime Style Way!")
 
-st.sidebar.header("Adjust Filters")
+st.sidebar.header("Adjust Filters (only for Ghibli Style)")
 contrast = st.sidebar.slider("Contrast", 0.5, 2.0, 1.0, 0.1)
 brightness = st.sidebar.slider("Brightness", 0.5, 2.0, 1.0, 0.1)
 saturation = st.sidebar.slider("Saturation", 0.0, 2.0, 1.0, 0.1)

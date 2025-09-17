@@ -10,14 +10,12 @@ model = torch.hub.load(
 )
 model.to(device).eval()
 
-transform = T.Compose([
-    T.Resize((512, 512)),
-    T.ToTensor(),
-    T.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-])
+to_tensor = T.ToTensor()
 to_pil = T.ToPILImage()
 
 def apply_ghibli_style(image, contrast, brightness, saturation, color_balance, blur_strength):
+    orig_size = image.size
+
     img = image.convert("RGB")
     img = ImageEnhance.Contrast(img).enhance(contrast)
     img = ImageEnhance.Brightness(img).enhance(brightness)
@@ -25,10 +23,16 @@ def apply_ghibli_style(image, contrast, brightness, saturation, color_balance, b
     if blur_strength > 0:
         img = img.filter(ImageFilter.GaussianBlur(blur_strength))
 
-    x = transform(img).unsqueeze(0).to(device)
+    resize = T.Resize(512)
+    x = to_tensor(resize(img)).unsqueeze(0).to(device)
+    x = (x - 0.5) / 0.5 
+
     with torch.no_grad():
-        out = model(x)[0].cpu() * 0.5 + 0.5
+        out = model(x)[0].cpu()
+    out = (out * 0.5 + 0.5).clamp(0, 1)
+
     styled_img = to_pil(out)
+    styled_img = styled_img.resize(orig_size, Image.Resampling.LANCZOS)
     return styled_img
 
 def apply_sketch_style(image):
@@ -40,3 +44,4 @@ def apply_sketch_style(image):
     blur = cv2.GaussianBlur(inv, (21, 21), 0)
     sketch = cv2.divide(cv_img, 255 - blur, scale=256)
     return Image.fromarray(sketch)
+    
